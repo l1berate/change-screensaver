@@ -6,17 +6,17 @@ import io
 from PIL import Image
 
 
-"""Example Command: python talktodeck.py change-screensaver C:\Users\whoever\Pictures\test.jpg"""
+# Example Command: python talktodeck.py change-screensaver C:\Users\whoever\Pictures\test.jpg
 
-"""To do: Reverse engineer the starting bytes to correctly generate them for each packet.
-          Seperate the image data into packets of 1024 bytes."""
+# To do: Reverse engineer the starting bytes to correctly generate them for each packet.
+#        Seperate the image data into packets of 1024 bytes.
 
-"""This script was used while reverse engineering the protocol used by the StreamDeck to change screensavers.
-   Turns out, not only the screensaver but all key images are sent to the StreamDeck at the same time.
-   The start data contains the proceeding info which I'm guessing is the command to write the image to the StreamDeck,
-   the key image coordinates, and the image size. The image data is a jpeg file which is sent through many packets
-   following the first 8 bytes. The start data does change between every packet, but the first packet for a new image
-   should look pretty similar to the one below."""
+# This script was used while reverse engineering the protocol used by the StreamDeck to change screensavers.
+# Turns out, not only the screensaver but all key images are sent to the StreamDeck at the same time.
+# The start data contains the proceeding info which I'm guessing is the command to write the image to the StreamDeck,
+# the key image coordinates, and the image size. The image data is a jpeg file which is sent through many packets
+# following the first 8 bytes. The start data does change between every packet, but the first packet for a new image
+# should look pretty similar to the one below.
 
 
 @click.group()

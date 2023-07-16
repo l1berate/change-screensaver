@@ -5,22 +5,23 @@ import shutil
 from PIL import Image
 
 
-"""Example Command: python changess.py replace test.jpg"""
-"""Example Command: python changess.py add test C:\Users\whoever\Pictures\test.jpg"""
-"""Example Command: python changess.py remove test"""
+# Example Command: python changess.py replace test.jpg
+# Example Command: python changess.py add test C:\Users\whoever\Pictures\test.jpg
+# Example Command: python changess.py remove test
 
-"""This script will change the screensaver in the StreamDeck Assets directory to the specified file.
-   The file path and name must be added to the JSON file before it can be used. JSON_FILE and PNG_DIRECTORY
-   must be changed to the correct paths for your system. Full path name was used for json file because
-   changess.bat was used to run the script globally. This script could be used with other filetypes other
-   than jpeg, but the replace_png_files function would need to be slightly changed I think."""
+# This script will change the screensaver in the StreamDeck Assets directory to the specified file.
+# The file path and name must be added to the JSON file before it can be used. JSON_FILE and PNG_DIRECTORY
+# must be changed to the correct paths for your system. Full path name was used for json file because
+# changess.bat was used to run the script globally. This script could be used with other filetypes other
+# than jpeg, but the replace_png_files function would need to be slightly changed I think.
 
 
 # JSON file path
 JSON_FILE = "C:\\Users\\mrjdw\\source\\repos\\change-screensaver\\file_paths.json"
 
-#Directory path to screenshot png files
+# Directory path to screenshot png files
 PNG_DIRECTORY = "C:\\Users\\mrjdw\\AppData\\Roaming\\Elgato\\StreamDeck\\Assets"
+
 
 @click.group()
 def cli():
@@ -62,6 +63,7 @@ def list():
     else:
         print("No file paths found in the JSON file.")
 
+
 @cli.command()
 @click.argument('name')
 def replace(name):
@@ -88,7 +90,8 @@ def resize_image(file_path):
     desired_height = 272
 
     image = Image.open(file_path)
-    resized_image = image.resize((desired_width, desired_height), Image.Resampling.LANCZOS)
+    resized_image = image.resize(
+        (desired_width, desired_height), Image.Resampling.LANCZOS)
     resized_image.save(file_path)
 
 

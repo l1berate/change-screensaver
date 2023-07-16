@@ -2,13 +2,13 @@ import json
 import click
 
 
-"""Example Command: python pcaptopic.py convert C:\Users\whoever\Documents\Wireshark\capture.json"""
+# Example Command: python pcaptopic.py convert C:\Users\whoever\Documents\Wireshark\capture.json
 
-"""This script takes a json file containing raw usb data captures from Wireshark and converts it into jpeg files.
-   The script assumes that the data is going to a StreamDeck and that the data is in the format of a jpeg file.
-   It was used to reverse engineer the protocol used by the StreamDeck to change screensavers.
-   Turns out, not only the screensaver but all key images are sent to the StreamDeck at the same time.
-   The jpeg files will work and show the correct images, but please note that the some files will have extra data attached."""
+# This script takes a json file containing raw usb data captures from Wireshark and converts it into jpeg files.
+# The script assumes that the data is going to a StreamDeck and that the data is in the format of a jpeg file.
+# It was used to reverse engineer the protocol used by the StreamDeck to change screensavers.
+# Turns out, not only the screensaver but all key images are sent to the StreamDeck at the same time.
+# The jpeg files will work and show the correct images, but please note that the some files will have extra data attached.
 
 
 @click.group()
