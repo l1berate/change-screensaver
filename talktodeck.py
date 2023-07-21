@@ -24,8 +24,26 @@ def cli():
     pass
 
 
-vendor_id = 0xfd9
-product_id = 0x80
+VENDOR_ID = 0xfd9
+PRODUCT_ID = 0x80
+# Below is copied from https://github.com/abcminiuser/python-elgato-streamdeck/
+KEY_COUNT = 15
+KEY_COLS = 5
+KEY_ROWS = 3
+
+KEY_PIXEL_WIDTH = 72
+KEY_PIXEL_HEIGHT = 72
+KEY_IMAGE_FORMAT = "JPEG"
+KEY_FLIP = (True, True)
+KEY_ROTATION = 0
+
+DECK_TYPE = "Stream Deck Original"
+DECK_VISUAL = True
+
+IMAGE_REPORT_LENGTH = 1024
+IMAGE_REPORT_HEADER_LENGTH = 8
+IMAGE_REPORT_PAYLOAD_LENGTH = IMAGE_REPORT_LENGTH - IMAGE_REPORT_HEADER_LENGTH
+# End of copy
 
 
 @cli.command()
@@ -37,7 +55,7 @@ def change_screensaver(path):
         exit()
 
     # find our device
-    dev = libusb_package.find(idVendor=vendor_id, idProduct=product_id)
+    dev = libusb_package.find(idVendor=VENDOR_ID, idProduct=PRODUCT_ID)
 
     # was it found?
     if dev is None:
@@ -62,10 +80,11 @@ def change_screensaver(path):
     # Here you can perform various operations with the device,
     # such as reading or writing data to the endpoint
 
-    # Example: Write data to the endpoint
-    start_data = b"\x02\x07\x00\x00\xf8\x03\x00\x00"
-    data = convert_image_to_jpg(path)
-    endpoint.write(start_data + data)
+    # Write data to the endpoint
+    image = convert_image_to_jpg(path)
+    data_array = set_screensaver(image)
+    for data in data_array:
+        endpoint.write(data)
 
     # Cleanup and release the device
     usb.util.dispose_resources(dev)
@@ -78,6 +97,51 @@ def convert_image_to_jpg(image_path):
     image_bytes = io.BytesIO()
     image.save(image_bytes, format='JPEG')
     return image_bytes.getvalue()
+
+
+def set_screensaver(image):
+    """Set the screensaver to the specified image. Modified from https://github.com/abcminiuser/python-elgato-streamdeck/"""
+    device = []
+
+    # Could add blank image like abcminiuser did but will skip for now.
+    image = bytes(image)
+
+    page_number = 0
+    bytes_remaining = len(image)
+    while bytes_remaining > 0:
+        this_length = min(bytes_remaining, 1016)
+        bytes_sent = page_number * 1016
+
+        """ header = [
+            0x02,
+            0x09,
+            0X08,
+            1 if this_length == bytes_remaining else 0,
+            page_number & 0xFF,
+            page_number >> 8,
+            this_length & 0xFF,
+            this_length >> 8
+        ] """
+
+        header = [
+            0x02,
+            0x08,
+            0X00,
+            1 if this_length == bytes_remaining else 0,
+            this_length & 0xFF,
+            this_length >> 8,
+            page_number & 0xFF,
+            page_number >> 8
+        ]
+
+        payload = bytes(header) + image[bytes_sent:bytes_sent + this_length]
+        padding = bytearray(IMAGE_REPORT_LENGTH - len(payload))
+        device.append(payload + padding)
+
+        bytes_remaining = bytes_remaining - this_length
+        page_number = page_number + 1
+
+    return device
 
 
 if __name__ == '__main__':
